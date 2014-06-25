@@ -36,6 +36,7 @@ from array import array
 MAX_INT = 4294967295
 decryptState = array("I")
 decryptState.append(0xdeadcafe)
+pyver=sys.version_info[0]
 
 def advanceDecryptor():
 	global decryptState
@@ -50,12 +51,12 @@ def extractAll(fname):
 	uint32_t_size = 4
 	sig = struct.unpack('I', pfile.read(uint32_t_size))[0]
 	if sig != 1397966674:
-		print "Error: not a valid 'Game.rgssad' datafile"
+		print ("Error: not a valid 'Game.rgssad' datafile")
 		sys.exit(-1)
 
 	sig = struct.unpack('I', pfile.read(uint32_t_size))[0]
 	if sig != 16794689:
-		print "Error: not a valid 'Game.rgssad' datafile"
+		print ("Error: not a valid 'Game.rgssad' datafile")
 		sys.exit(-1)
 
 	numfiles = 0
@@ -80,7 +81,10 @@ def extractAll(fname):
 		fnameList = list(fname)
 
 		for i in range(0, fnameLen):
-			fnameList[i] = chr(ord(fnameList[i]) ^ (decryptState[0] & 0xFF))
+			if pyver == 2:
+				fnameList[i] = chr(ord(fnameList[i]) ^ (decryptState[0] & 0xFF))
+			else:
+				fnameList[i] = chr(fnameList[i] ^ (decryptState[0] & 0xFF))
 			advanceDecryptor()
 
 			#hack to mkdir everything
@@ -88,10 +92,10 @@ def extractAll(fname):
 				dirname = fnameList[:i]
 				if not os.path.exists("".join(dirname)):
 					os.mkdir("".join(dirname), stat.S_IRWXU)
-					print "Creating " + "".join(dirname) + "..."
+					print ("Creating " + "".join(dirname) + "...")
 				fnameList[i] = '/'
 
-		print "Extracting " + "".join(fnameList) + "..."
+		print ("Extracting " + "".join(fnameList) + "...")
 		#get file size
 		fsize = struct.unpack('I', pfile.read(uint32_t_size))[0]
 		#sys.exit(1)
@@ -104,9 +108,9 @@ def extractAll(fname):
 		try:
 			outFile = open("".join(fnameList), "wb")
 		except IOError:
-			print "Error, could not create " + fname + "."
-			print "Check that you have write permissions to the current directory"
-			print "Extraction will now halt"
+			print ("Error, could not create " + fname + ".")
+			print ("Check that you have write permissions to the current directory")
+			print ("Extraction will now halt")
 			close(pfile)
 			sys.exit(-1)
 
@@ -117,7 +121,10 @@ def extractAll(fname):
 			# Get the 'idx'th byte from decryptState (little endian)
 			xorValue = (decryptState[0] >> (idx & 3) * 8) & 0xFF
 			c = chr(ord(c) ^ xorValue)
-			outFile.write(c)
+			if pyver == 2:
+				outFile.write(c)
+			else:
+				outFile.write(bytes(c,'UTF-8'))
 			if (idx & 3) == 3:
 				advanceDecryptor()
 			idx += 1
@@ -130,7 +137,7 @@ def extractAll(fname):
 		decryptState[0] = decryptState[1]
 		numfiles = numfiles + 1
 	pfile.close()
-	print "Extracted " + str(numfiles) + " files!"
+	print ("Extracted " + str(numfiles) + " files!")
 
 def main(argv):
 	fname = "Game.rgssad"
