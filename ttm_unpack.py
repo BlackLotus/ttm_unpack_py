@@ -8,22 +8,22 @@
 # Copyright (c) 2012, Jukka Pietila <jukkapietila@gmail.com>
 # All rights reserved.
 
-# Redistribution and use in source and binary forms, with or without modification, are permitted provided 
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided
 # that the following conditions are met:
 
-# Redistributions of source code must retain the above copyright notice, this list of 
+# Redistributions of source code must retain the above copyright notice, this list of
 # conditions and the following disclaimer.
-# Redistributions in binary form must reproduce the above copyright notice, this list of 
-# conditions and the following disclaimer in the documentation and/or other materials provided with the 
+# Redistributions in binary form must reproduce the above copyright notice, this list of
+# conditions and the following disclaimer in the documentation and/or other materials provided with the
 # distribution.
 
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED 
-# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A 
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR 
-# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
-# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
-# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+# TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
 import io
@@ -34,7 +34,7 @@ import struct
 from array import array
 
 MAX_INT = 4294967295
-decryptState = array("I") 
+decryptState = array("I")
 decryptState.append(0xdeadcafe)
 
 def advanceDecryptor():
@@ -50,14 +50,14 @@ def extractAll(fname):
 	uint32_t_size = 4
 	sig = struct.unpack('I', pfile.read(uint32_t_size))[0]
 	if sig != 1397966674:
-		print "Error: not a valid 'To the Moon' datafile"
+		print "Error: not a valid 'Game.rgssad' datafile"
 		sys.exit(-1)
-	
+
 	sig = struct.unpack('I', pfile.read(uint32_t_size))[0]
 	if sig != 16794689:
-		print "Error: not a valid 'To the Moon' datafile"
+		print "Error: not a valid 'Game.rgssad' datafile"
 		sys.exit(-1)
-	
+
 	numfiles = 0
 	decryptState.append(decryptState[0])
 
@@ -90,7 +90,7 @@ def extractAll(fname):
 					os.mkdir("".join(dirname), stat.S_IRWXU)
 					print "Creating " + "".join(dirname) + "..."
 				fnameList[i] = '/'
-		
+
 		print "Extracting " + "".join(fnameList) + "..."
 		#get file size
 		fsize = struct.unpack('I', pfile.read(uint32_t_size))[0]
@@ -109,7 +109,7 @@ def extractAll(fname):
 			print "Extraction will now halt"
 			close(pfile)
 			sys.exit(-1)
-		
+
 		idx = 0
 		#read and decrypt file
 		while idx != fsize:
@@ -122,7 +122,7 @@ def extractAll(fname):
 				advanceDecryptor()
 			idx += 1
 		outFile.close()
-		
+
 		# restore the decryptor state
 		# seems a bit weird, but seems to have been done
 		# to make sure the game has fast random-access
@@ -133,11 +133,10 @@ def extractAll(fname):
 	print "Extracted " + str(numfiles) + " files!"
 
 def main(argv):
-	fname = "To the Moon.rgssad"
+	fname = "Game.rgssad
 	if len(argv) > 1:
 		fname = argv[1]
 	extractAll(fname)
 
 if __name__ == "__main__":
 	main(sys.argv)
-
