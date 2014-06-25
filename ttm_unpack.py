@@ -133,7 +133,7 @@ def extractAll(fname):
 	print "Extracted " + str(numfiles) + " files!"
 
 def main(argv):
-	fname = "Game.rgssad
+	fname = "Game.rgssad"
 	if len(argv) > 1:
 		fname = argv[1]
 	extractAll(fname)
